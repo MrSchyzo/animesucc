@@ -1,0 +1,123 @@
+/* Loading spinner styles */
+.loading-spinner {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 8px solid #333;
+    border-top: 8px solid #1e90ff;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    z-index: 2000;
+}
+#video-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 16px;
+}
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+body {
+    background-color: #252525;
+    color: #c7c7c7;
+    font-family: system-ui;
+}
+#logo {
+    height: 40px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+.succ-color {
+    color: rgb(183, 160, 138);
+}
+#query {
+    max-width: 100%;
+    min-width: 50%;
+    padding: 8px;
+    font-size: 16px;
+    margin-left: 32px;
+    border: none;
+    border-bottom: 2px solid #555;
+    background-color: #333;
+    color: #c7c7c7;
+}
+
+#query:focus {
+    outline: none;
+    border-bottom: 2px solid #1e90ff;
+}
+
+#query-results {
+    position: absolute;
+    background-color: #333;
+    border: 1px solid #555;
+    max-height: 300px;
+    overflow-y: auto;
+    width: calc(100% - 2px);
+    z-index: 1000;
+}
+
+#query-results div {
+    padding: 8px;
+    border-bottom: 1px solid #555;
+    cursor: pointer;
+}
+
+#query-results div:hover {
+    background-color: #444;
+}
+
+#video-player {
+    width: 85%;
+    margin-top: 16px;
+    background-color: black;
+    cursor: pointer;
+}
+
+#video-container-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 16px;
+}
+
+#video-episodes {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: 800px;
+}
+
+#video-episodes span {
+    background-color: #333;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+}
+
+#video-episodes span:hover {
+    background-color: #444;
+}
+
+nav {
+    position: sticky;
+    top: 0;
+    background-color: #252525;
+    padding: 8px 0;
+    z-index: 100;
+}
+
+nav input {
+    box-sizing: border-box;
+}
+
+nav input::placeholder {
+    color: #888;
+}

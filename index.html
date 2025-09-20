@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>AnimeSucc</title>
+        <link rel="stylesheet" href="./style.css">
+        <script src="./script.js" defer></script>
+    </head>
+    <body>
+        <nav>
+            <img src="./PlanetASucc.png" alt="Logo" id="logo"/>
+            <b><span>Anime</span><span class="succ-color">Succ</span></b>
+            <input id="query" name="query" type="text" class="form-control search-box" autocomplete="off" placeholder="Cerca un anime..." oninput="searchDebouncer()"/>
+            <div id="query-results"></div>
+        </nav>
+        <div id="video-container">
+            <div id="loading-spinner" class="loading-spinner" style="display:none;"></div>
+            <div id="video-container-title"></div>
+            <video 
+                id="video-player"
+                controls 
+                poster="./PlanetASuccLoading.png"
+                onloadeddata="onloaded('video-player')"
+                onclick="fullscreen('video-player')"
+                style="display: none;"
+            >
+                <source 
+                    id="video-player-source"
+                    type="video/mp4"
+                />
+            </video>
+            <div id="video-episodes">
+            </div>
+        </div>
+    </body>
+</html>
