@@ -1,3 +1,5 @@
+/// <reference path="./lib/hls.js" />
+
 function showSpinner() {
     document.getElementById("loading-spinner").style.display = "block";
 }
@@ -29,22 +31,52 @@ function fullscreen(id) {
     document.getElementById(id).requestFullscreen()
 }
 
-async function changeVideoSource(id, sourceLink, title) {
-    let video = document.getElementById(id)
-    video.setAttribute("poster", "./PlanetASuccLoading.png")
-    let videoSource = document.getElementById(`${id}-source`)
-    videoSource.src = await fetchVideoSource(sourceLink)
-    video.style.display = "block"
+async function changeVideoSource(sourceLink, title) {
+    let videoMp4 = document.getElementById("video-player-mp4")
+    let videoHls = document.getElementById("video-player-hls")
+    setVideoLoading("video-player-mp4")
+    setVideoLoading("video-player-hls")
+
+    let {src, playlist} = await fetchVideoSource(sourceLink)
+    
     document.getElementById("video-container-title").innerText = title
-    video.load()
+    if (src) {
+        videoHls.style.display = "none"
+        videoMp4.style.display = "block"
+        let videoSource = document.getElementById(`video-player-mp4-source`)
+        videoSource.src = src
+        videoMp4.load()
+    } else if (playlist) {
+        videoMp4.style.display = "none"
+        videoHls.style.display = "block"
+        if (videoHls.canPlayType('application/vnd.apple.mpegurl')) {
+            videoHls.src = playlist;
+        } else if (Hls.isSupported()) {
+            if (window.hls) {
+                window.hls.destroy()
+            }
+            var hls = new Hls();
+            window.hls = hls
+            hls.loadSource(playlist);
+            hls.attachMedia(videoHls);
+        }
+    }
+}
+
+function setVideoLoading(id) {
+    let video = document.getElementById(id)
+    video.pause()
+    video.currentTime = 0
+    if (window.hls) {
+        window.hls.destroy()
+    }
+    video.setAttribute("poster", "./PlanetASuccLoading.png")
 }
 
 async function search() {
     let query = document.getElementById("query")
     let q = encodeURIComponent(query.value)
-    await fetch(`${cors}https://www.animesaturn.cx/animelist?search=${q}`)
-        .then(response => response.text())
-        .then(html => parser.parseFromString(html, "text/html"))
+    await fetchDOM(`https://www.animesaturn.cx/animelist?search=${q}`)
         .then(doc => findNodesThat(doc.body, n => n.nodeName === "A" && n.classList.contains("badge", "badge-archivio")))
         .then(nodes => nodes.map(n => ({ link: n.href, title: n.innerText })))
         .then(doc => {
@@ -68,16 +100,16 @@ async function loadAnime(link) {
     let episodes = document.getElementById("video-episodes")
     episodes.innerHTML = ""
     document.getElementById("video-container-title").innerHTML = ""
+    setVideoLoading("video-player-mp4")
+    setVideoLoading("video-player-hls")
     showSpinner();
-    await fetch(`${cors}${link}`)
-        .then(response => response.text())
-        .then(html => parser.parseFromString(html, "text/html"))
+    await fetchDOM(link)
         .then(doc => findNodesThat(doc.body, n => n.nodeName === "A" && n.classList.contains("bottone-ep")))
         .then(nodes => nodes.map(n => ({ link: n.href, title: n.innerText.trim() })))
         .then(videos => {
             videos.forEach(v => {
                 let span = document.createElement("span")
-                span.onclick = _ => changeVideoSource("video-player", v.link, v.title)
+                span.onclick = _ => changeVideoSource(v.link, v.title)
                 span.innerText = v.title
                 episodes.appendChild(span)
             })
@@ -85,14 +117,45 @@ async function loadAnime(link) {
         .finally(hideSpinner);
 }
 
-async function fetchVideoSource(link) {
-    return await fetch(`${cors}${link}`)
+/**
+ * Fetch the video source URL from a specific anime episode page.
+ * @param {string} url 
+ * @returns {Promise<{src: string | null, playlist: string | null}>} The video source URL.
+ */
+async function fetchVideoSource(url) {
+    let videoLink = await getWatchPageURL(url)
+    if (!videoLink) throw new Error(`Watch page not found at ${url}`)
+
+    let watchDOM = await fetchDOM(videoLink)
+
+    let sourceUrl = findNodesThat(watchDOM, n => n.nodeName === "SOURCE")[0]?.getAttribute("src") || null
+    if (sourceUrl) return {src: sourceUrl, playlist: null}
+
+    let playlist = findNodesThat(watchDOM, n => n.nodeName === "SCRIPT" && n.getAttribute("type") === "text/javascript" && n.textContent.includes(".m3u8"))[0]
+        ?.textContent
+        ?.match(/(https?:\/\/[^'"]+\.m3u8[^'"]*)/)
+        ?.[0]
+
+    return {src: null, playlist: playlist || null}
+}
+
+/**
+ * Get the URL of the watch page for a specific anime episode.
+ * @param {string} url 
+ * @returns {Promise<string | null>} The URL of the watch page, if present. Falsey value otherwise.
+ */
+async function getWatchPageURL(url) {
+    let dom = await fetchDOM(url)
+    return findNodesThat(dom.body, n => n.nodeName === "A" && n.getAttribute("href")?.includes("watch?"))[0]?.href
+}
+
+/**
+ * Fetch the DOM of a specific page.
+ * @param {string} url 
+ * @returns {Promise<Document>} The DOM of the page.
+ */
+async function fetchDOM(url) {
+    return await fetch(`${cors}${url}`)
         .then(response => response.text())
         .then(html => parser.parseFromString(html, "text/html"))
-        .then(doc => findNodesThat(doc.body, n => n.nodeName === "A" && n.getAttribute("href")?.includes("watch?"))[0])
-        .then(nodes => fetch(`${cors}${nodes.href}`))
-        .then(response => response.text())
-        .then(html => parser.parseFromString(html, "text/html"))
-        .then(doc => findNodesThat(doc, n => n.nodeName === "SOURCE")[0])
-        .then(nodes => nodes?.getAttribute("src"))
 }
