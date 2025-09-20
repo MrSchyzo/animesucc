@@ -73,9 +73,11 @@ body {
     background-color: #444;
 }
 
-#video-player {
+.video-player {
     width: 85%;
     max-width: 1080px;
+    max-height: 608px;
+    aspect-ratio: 16 / 9;
     margin-top: 16px;
     background-color: black;
     cursor: pointer;

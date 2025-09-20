@@ -4,7 +4,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>AnimeSucc</title>
         <link rel="stylesheet" href="./style.css">
-        <script src="./script.js" defer></script>
+        <script src="./script.js" type="text/javascript" defer></script>
+        <script src="./lib/hls.js" type="text/javascript" defer></script>
     </head>
     <body>
         <nav>
@@ -17,15 +18,25 @@
             <div id="loading-spinner" class="loading-spinner" style="display:none;"></div>
             <div id="video-container-title"></div>
             <video 
-                id="video-player"
+                class="video-player"
+                id="video-player-hls"
                 controls 
                 poster="./PlanetASuccLoading.png"
-                onloadeddata="onloaded('video-player')"
-                onclick="fullscreen('video-player')"
+                onloadeddata="onloaded('video-player-hls')"
+                onclick="fullscreen('video-player-hls')"
+                style="display: none;"
+            ></video>
+            <video 
+                class="video-player"
+                id="video-player-mp4"
+                controls 
+                poster="./PlanetASuccLoading.png"
+                onloadeddata="onloaded('video-player-mp4')"
+                onclick="fullscreen('video-player-mp4')"
                 style="display: none;"
             >
                 <source 
-                    id="video-player-source"
+                    id="video-player-mp4-source"
                     type="video/mp4"
                 />
             </video>
