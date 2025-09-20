@@ -2,7 +2,7 @@
 
 ![AnimeSucc](PlanetASucc.png)
 
-**AnimeSucc** is a client-only crawler for [AnimeSaturn](https://www.animesaturn.cx). It allows simple search and video playback without the hassle of adware.
+**AnimeSucc** is a client-only crawler for [AnimeSaturn](https://www.animesaturn.cx). It allows simple search and video playback without pesky ads.
 
 ## How to Run Locally
 
