@@ -1,3 +1,8 @@
+/* Remove underline from all anchor tags */
+a {
+    text-decoration: none;
+    color: inherit;
+}
 /* Loading spinner styles */
 .loading-spinner {
     display: none;
@@ -35,6 +40,9 @@ body {
 }
 .succ-color {
     color: rgb(183, 160, 138);
+}
+.saturn-color {
+    color: #dbc1ff;
 }
 #query {
     max-width: 100%;

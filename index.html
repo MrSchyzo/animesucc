@@ -1,47 +1,39 @@
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>AnimeSucc</title>
-        <link rel="stylesheet" href="./style.css">
-        <script src="./script.js" type="text/javascript" defer></script>
-        <script src="./lib/hls.js" type="text/javascript" defer></script>
-    </head>
-    <body>
-        <nav>
-            <img src="./PlanetASucc.png" alt="Logo" id="logo"/>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnimeSucc</title>
+    <link rel="stylesheet" href="./style.css">
+    <script src="./script.js" type="text/javascript" defer></script>
+    <script src="./lib/hls.js" type="text/javascript" defer></script>
+</head>
+
+<body>
+    <nav>
+        <a href="https://github.com/MrSchyzo/animesucc" target="_blank" rel="noopener noreferrer nofollow">
+            <img src="./PlanetASucc.png" alt="Logo" id="logo" />
             <b><span>Anime</span><span class="succ-color">Succ</span></b>
-            <input id="query" name="query" type="text" class="form-control search-box" autocomplete="off" placeholder="Cerca un anime..." oninput="searchDebouncer()"/>
-            <div id="query-results"></div>
-        </nav>
-        <div id="video-container">
-            <div id="loading-spinner" class="loading-spinner" style="display:none;"></div>
-            <div id="video-container-title"></div>
-            <video 
-                class="video-player"
-                id="video-player-hls"
-                controls 
-                poster="./PlanetASuccLoading.png"
-                onloadeddata="onloaded('video-player-hls')"
-                onclick="fullscreen('video-player-hls')"
-                style="display: none;"
-            ></video>
-            <video 
-                class="video-player"
-                id="video-player-mp4"
-                controls 
-                poster="./PlanetASuccLoading.png"
-                onloadeddata="onloaded('video-player-mp4')"
-                onclick="fullscreen('video-player-mp4')"
-                style="display: none;"
-            >
-                <source 
-                    id="video-player-mp4-source"
-                    type="video/mp4"
-                />
-            </video>
-            <div id="video-episodes">
-            </div>
+        </a>
+        (thin client for <a href="https://www.animesaturn.cx" target="_blank"
+            rel="noopener noreferrer nofollow"><b><span>Anime</span><span class="saturn-color">Saturn®</span></b></a>)
+        <input id="query" name="query" type="text" class="form-control search-box" autocomplete="off"
+            placeholder="Cerca un anime..." oninput="searchDebouncer()" />
+        <div id="query-results"></div>
+    </nav>
+    <div id="video-container">
+        <div id="loading-spinner" class="loading-spinner" style="display:none;"></div>
+        <div id="video-container-title"></div>
+        <video class="video-player" id="video-player-hls" controls poster="./PlanetASuccLoading.png"
+            onloadeddata="onloaded('video-player-hls')" onclick="fullscreen('video-player-hls')"
+            style="display: none;"></video>
+        <video class="video-player" id="video-player-mp4" controls poster="./PlanetASuccLoading.png"
+            onloadeddata="onloaded('video-player-mp4')" onclick="fullscreen('video-player-mp4')" style="display: none;">
+            <source id="video-player-mp4-source" type="video/mp4" />
+        </video>
+        <div id="video-episodes">
         </div>
-    </body>
+    </div>
+</body>
+
 </html>
