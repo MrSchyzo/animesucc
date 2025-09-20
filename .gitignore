@@ -1,0 +1,19 @@
+# Tool directories
+.serena/
+
+# Go build output
+cli/vendor/
+*.test
+*.out
+coverage.html
+coverage.txt
+dist/
+
+# Compiled binaries (project-specific)
+cli/succ
+server/succ-server
+server/server
+
+.DS_Store
+
+*.mp4

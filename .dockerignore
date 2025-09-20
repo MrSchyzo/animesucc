@@ -1,0 +1,10 @@
+.git
+.github
+.vscode
+.claude
+**/*.test
+cli/succ
+server/server
+server/succ-server
+readme.md
+*.md
