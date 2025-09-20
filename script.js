@@ -53,7 +53,7 @@ async function search() {
             doc.forEach(d => {
                 let div = document.createElement("div")
                 let a = document.createElement("a")
-                a.onclick = _ => {
+                div.onclick = _ => {
                     loadAnime(d.link)
                     results.innerHTML = ""
                 }
