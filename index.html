@@ -1,6 +1,7 @@
 <html>
 
 <head>
+    <meta name="referrer" content="no-referrer"/>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AnimeSucc</title>
@@ -24,12 +25,12 @@
     <div id="video-container">
         <div id="loading-spinner" class="loading-spinner" style="display:none;"></div>
         <div id="video-container-title"></div>
-        <video class="video-player" id="video-player-hls" controls poster="./PlanetASuccLoading.png"
+        <video referrerpolicy="no-referrer" class="video-player" id="video-player-hls" controls poster="./PlanetASuccLoading.png"
             onloadeddata="onloaded('video-player-hls')" onclick="fullscreen('video-player-hls')"
             style="display: none;"></video>
-        <video class="video-player" id="video-player-mp4" controls poster="./PlanetASuccLoading.png"
+        <video referrerpolicy="no-referrer" class="video-player" id="video-player-mp4" controls poster="./PlanetASuccLoading.png"
             onloadeddata="onloaded('video-player-mp4')" onclick="fullscreen('video-player-mp4')" style="display: none;">
-            <source id="video-player-mp4-source" type="video/mp4" />
+            <source referrerpolicy="no-referrer" id="video-player-mp4-source" type="video/mp4" />
         </video>
         <div id="video-episodes">
         </div>
