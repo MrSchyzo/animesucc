@@ -89,6 +89,13 @@ body {
     cursor: pointer;
 }
 
+#anime-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-top: 16px;
+    text-align: center;
+}
+
 #video-container-title {
     font-size: 20px;
     font-weight: bold;
