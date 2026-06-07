@@ -210,6 +210,13 @@ function renderEpisodePage() {
     episodesEl.appendChild(pag)
 }
 
+function initFromURL() {
+    const q = new URLSearchParams(window.location.search).get("search")
+    if (!q) return
+    document.getElementById("query").value = q
+    search()
+}
+
 async function loadAnime(link, title) {
     const episodesEl = document.getElementById("video-episodes")
     episodesEl.innerHTML = ""
@@ -238,3 +245,5 @@ async function loadAnime(link, title) {
         hideSpinner()
     }
 }
+
+initFromURL()
