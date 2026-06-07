@@ -113,7 +113,7 @@ async function search() {
         let div = document.createElement("div")
         let a = document.createElement("a")
         div.onclick = _ => {
-            loadAnime(r.link)
+            loadAnime(r.link, r.name)
             container.innerHTML = ""
         }
         a.innerText = r.name
@@ -210,9 +210,10 @@ function renderEpisodePage() {
     episodesEl.appendChild(pag)
 }
 
-async function loadAnime(link) {
+async function loadAnime(link, title) {
     const episodesEl = document.getElementById("video-episodes")
     episodesEl.innerHTML = ""
+    document.getElementById("anime-title").innerText = title ?? ""
     document.getElementById("video-container-title").innerHTML = ""
 
     if (window.hls) { window.hls.destroy(); window.hls = null }
