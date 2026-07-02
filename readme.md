@@ -2,7 +2,7 @@
 
 ![AnimeSucc](./site/PlanetASucc.png)
 
-**AnimeSucc** is a crawler for [AnimeSaturn](https://www.animesaturn.cx) giving you ad-free search and playback. It ships in four pieces:
+**AnimeSucc** is a crawler for [AnimeSaturn](https://www.animesaturn.net) giving you ad-free search and playback. It ships in four pieces:
 
 | Piece      | What it is                                                               |
 |------------|--------------------------------------------------------------------------|
@@ -151,6 +151,18 @@ go build -o succ .
 | `-p, --position`    | Pick the Nth (1-based) search result; skips the prompt     | prompt  |
 | `-o, --output`      | Output directory                                           | `.`     |
 | `-j, --parallel`    | Max concurrent downloads                                   | `3`     |
+
+---
+
+## Configuration
+
+AnimeSaturn periodically rotates its domain. Both the CLI and server default to
+`https://www.animesaturn.net` and can be redirected without rebuilding:
+
+| Env var                   | Applies to   | Default                        | Purpose                                                                 |
+|---------------------------|--------------|--------------------------------|-------------------------------------------------------------------------|
+| `ANIMESUCC_BASE_URL`      | CLI + server | `https://www.animesaturn.net`  | Base site URL for search / anime / player pages. Set if the site moves. |
+| `ANIMESUCC_PROXY_REFERER` | server       | `https://play.saturncdn.net/`  | `Referer` sent to the video CDN when proxying streams.                  |
 
 ---
 

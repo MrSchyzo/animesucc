@@ -7,10 +7,11 @@ import (
 
 type SearchResult struct {
 	Name    string `json:"name"`
-	Link    string `json:"link"`
+	Link    string `json:"link"`  // anime slug (no "/anime/" prefix); feeds GetEpisodes
 	Image   string `json:"image"`
-	Release string `json:"release"`
-	State   string `json:"state"`
+	Release string `json:"release"` // ".ac__sub" text, e.g. "15 Febbraio 2007 · 500 ep"
+	State   string `json:"state"`   // no longer surfaced on the search card; kept for JSON compat
+	Type    string `json:"type"`    // ".ac__type-badge" (TV / Movie / OVA …)
 }
 
 type Episode struct {
@@ -22,8 +23,9 @@ type Episode struct {
 type VideoSourceType string
 
 const (
-	VideoSourceMP4  VideoSourceType = "mp4"
-	VideoSourceM3U8 VideoSourceType = "m3u8"
+	VideoSourceMP4     VideoSourceType = "mp4"
+	VideoSourceM3U8    VideoSourceType = "m3u8"
+	VideoSourceYouTube VideoSourceType = "youtube"
 )
 
 type VideoSource struct {

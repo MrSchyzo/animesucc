@@ -8,16 +8,28 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+	"os"
 	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
-const (
-	proxyUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-	proxyReferer   = "https://www.animesaturn.cx/"
+// proxyReferer is sent to the streampeaker.org CDN. It defaults to the embed origin
+// (play.saturncdn.net) and is overridable via ANIMESUCC_PROXY_REFERER. The CDN gates on
+// signed URLs rather than Referer, so this is mostly cosmetic, but it keeps requests
+// looking like they came from the player.
+var (
+	proxyUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+	proxyReferer   = envOr("ANIMESUCC_PROXY_REFERER", "https://play.saturncdn.net/")
 )
+
+func envOr(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
+}
 
 // hopByHop headers must not be forwarded (RFC 2616 §13.5.1).
 var hopByHop = map[string]bool{

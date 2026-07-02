@@ -1,3 +1,5 @@
+//go:build integration
+
 package animesucc
 
 import (
@@ -9,8 +11,7 @@ import (
 func TestClient_AnimeSaturnReachable(t *testing.T) {
 	t.Parallel()
 	c := NewClient()
-	// animesaturn.cx works fine with Go's HTTP client
-	body, err := c.fetchURL(context.Background(), "https://www.animesaturn.cx/")
+	body, err := c.fetchURL(context.Background(), "https://www.animesaturn.net/")
 	if err != nil {
 		t.Fatalf("fetchURL(animesaturn): %v", err)
 	}
@@ -21,10 +22,11 @@ func TestClient_AnimeSaturnReachable(t *testing.T) {
 
 func TestCDNReachableViaCurl(t *testing.T) {
 	t.Parallel()
-	// CDN servers reject Go's TLS but work with curl
-	// Use -r 0-1023 to only fetch the first 1KB as a reachability check
-	u := "https://srv16.kuku.streampeaker.org/DDL/ANIME/AniNiTsukeruKusuriWaNai/AniNiTsukeruKusuriWaNai_Ep_01_SUB_ITA.mp4"
-	cmd := exec.CommandContext(context.Background(), "curl", "-sL", "-r", "0-1023", u)
+	// CDN servers reject Go's TLS but work with curl. Resolve a fresh signed URL via the
+	// full scraping flow (the old hardcoded CDN URL was ephemeral) and range-fetch it.
+	src := liveM3U8Source(context.Background(), t)
+	cmd := exec.CommandContext(context.Background(), "curl", "-sL", "-r", "0-1023",
+		"-H", "Referer: https://play.saturncdn.net/", src.URL)
 	out, err := cmd.Output()
 	if err != nil {
 		t.Fatalf("curl CDN reachability check: %v", err)

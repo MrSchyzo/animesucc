@@ -2,70 +2,56 @@ package animesucc
 
 import (
 	"context"
+	"strings"
 	"testing"
 )
 
-func TestSearch_Naruto(t *testing.T) {
+func TestSearch_ParsesResultCards(t *testing.T) {
 	t.Parallel()
-	c := NewClient()
+	srv := newSaturnServer(t, "m3u8", nil)
+	c := NewClient(WithBaseURL(srv.URL))
+
 	results, err := c.Search(context.Background(), "naruto")
 	if err != nil {
-		t.Fatalf("Search failed: %v", err)
+		t.Fatalf("Search: %v", err)
 	}
-	if len(results) == 0 {
-		t.Fatal("expected at least one result")
+	// The hero/"In evidenza" slider link must be excluded; only a.ac cards count.
+	if len(results) != 2 {
+		t.Fatalf("expected 2 result cards, got %d: %+v", len(results), results)
 	}
 
-	foundNaruto := false
-	for _, r := range results {
-		if r.Name == "Naruto" {
-			foundNaruto = true
-		}
-		if r.Link == "" {
-			t.Errorf("result %q has empty link", r.Name)
-		}
-		if r.Name == "" {
-			t.Error("result has empty name")
-		}
+	got := results[0]
+	if got.Name != "Naruto" {
+		t.Errorf("Name = %q, want Naruto", got.Name)
 	}
-	if !foundNaruto {
-		t.Error("expected to find an exact match for 'Naruto'")
+	if got.Link != "naruto-iN621" {
+		t.Errorf("Link = %q, want naruto-iN621 (slug, no /anime/ prefix)", got.Link)
+	}
+	if got.Type != "TV" {
+		t.Errorf("Type = %q, want TV", got.Type)
+	}
+	if !strings.Contains(got.Image, "17405l.jpg") {
+		t.Errorf("Image = %q, want to contain 17405l.jpg", got.Image)
+	}
+	if !strings.Contains(got.Release, "220 ep") {
+		t.Errorf("Release = %q, want to contain '220 ep'", got.Release)
+	}
+
+	if results[1].Link != "one-piece-PmTvj" {
+		t.Errorf("results[1].Link = %q, want one-piece-PmTvj", results[1].Link)
 	}
 }
 
 func TestSearch_NoResults(t *testing.T) {
 	t.Parallel()
-	c := NewClient()
-	results, err := c.Search(context.Background(), "xyznonexistent999")
+	srv := newSaturnServer(t, "m3u8", nil)
+	c := NewClient(WithBaseURL(srv.URL))
+
+	results, err := c.Search(context.Background(), "none")
 	if err != nil {
-		t.Fatalf("Search failed: %v", err)
+		t.Fatalf("Search: %v", err)
 	}
 	if len(results) != 0 {
 		t.Errorf("expected 0 results, got %d", len(results))
-	}
-}
-
-func TestSearch_Frieren(t *testing.T) {
-	t.Parallel()
-	c := NewClient()
-	results, err := c.Search(context.Background(), "frieren")
-	if err != nil {
-		t.Fatalf("Search failed: %v", err)
-	}
-	if len(results) == 0 {
-		t.Fatal("expected at least one result for frieren")
-	}
-
-	found := false
-	for _, r := range results {
-		if r.Name == "Frieren: Beyond Journey's End" {
-			found = true
-			if r.State == "" {
-				t.Error("expected non-empty state")
-			}
-		}
-	}
-	if !found {
-		t.Error("expected to find Frieren: Beyond Journey's End")
 	}
 }

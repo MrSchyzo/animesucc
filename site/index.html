@@ -16,7 +16,7 @@
             <img src="./PlanetASucc.png" alt="Logo" id="logo" />
             <b><span>Anime</span><span class="succ-color">Succ</span></b>
         </a>
-        (it succs from <a href="https://www.animesaturn.cx" target="_blank"
+        (it succs from <a href="https://www.animesaturn.net" target="_blank"
             rel="noopener noreferrer nofollow"><b><span>Anime</span><span class="saturn-color">Saturn®</span></b></a>)
         <input id="query" name="query" type="text" class="form-control search-box" autocomplete="off"
             placeholder="Cerca un anime..." oninput="searchDebouncer()" />
@@ -33,6 +33,8 @@
             onloadeddata="onloaded('video-player-mp4')" onclick="fullscreen('video-player-mp4')" style="display: none;">
             <source referrerpolicy="no-referrer" id="video-player-mp4-source" type="video/mp4" />
         </video>
+        <iframe referrerpolicy="no-referrer" class="video-player" id="video-player-youtube" allowfullscreen
+            allow="autoplay; fullscreen" style="display: none;"></iframe>
         <div id="video-episodes">
         </div>
     </div>

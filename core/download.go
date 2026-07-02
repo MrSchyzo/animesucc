@@ -78,6 +78,8 @@ func (c *Client) downloadEpisode(ctx context.Context, ep Episode, output OutputF
 		return c.downloadFile(ctx, src.URL, w, progressFn)
 	case VideoSourceM3U8:
 		return c.downloadHLS(ctx, src.URL, w, progressFn)
+	case VideoSourceYouTube:
+		return fmt.Errorf("ep %d is a YouTube-hosted source (%s); download not supported", ep.Number, src.URL)
 	default:
 		return fmt.Errorf("unknown video source type %q", src.Type)
 	}
