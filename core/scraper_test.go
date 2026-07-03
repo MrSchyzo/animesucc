@@ -2,86 +2,95 @@ package animesucc
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 )
 
-func TestGetEpisodes_Naruto(t *testing.T) {
+func TestGetEpisodes(t *testing.T) {
 	t.Parallel()
-	c := NewClient()
-	episodes, err := c.GetEpisodes(context.Background(), "Naruto-aaaaaaa")
+	srv := newSaturnServer(t, "m3u8", nil)
+	c := NewClient(WithBaseURL(srv.URL))
+
+	eps, err := c.GetEpisodes(context.Background(), "naruto-iN621")
 	if err != nil {
-		t.Fatalf("GetEpisodes failed: %v", err)
+		t.Fatalf("GetEpisodes: %v", err)
 	}
-
-	if len(episodes) != 220 {
-		t.Fatalf("expected 220 episodes, got %d", len(episodes))
+	// Fixture has 3 distinct episodes (with duplicate + out-of-order links, and a
+	// non-episode /anime/ link that must be ignored).
+	if len(eps) != 3 {
+		t.Fatalf("expected 3 episodes, got %d: %+v", len(eps), eps)
 	}
-
-	for i, ep := range episodes {
-		expected := i + 1
-		if ep.Number != expected {
-			t.Errorf("episode %d: expected number %d, got %d", i, expected, ep.Number)
+	for i, ep := range eps {
+		wantNum := i + 1
+		if ep.Number != wantNum {
+			t.Errorf("eps[%d].Number = %d, want %d (sorted ascending)", i, ep.Number, wantNum)
 		}
-		if ep.URL == "" {
-			t.Errorf("episode %d: empty URL", ep.Number)
-		}
-		if ep.Slug == "" {
-			t.Errorf("episode %d: empty Slug", ep.Number)
+		wantURL := srv.URL + "/anime/naruto-iN621/ep-" + strconv.Itoa(wantNum)
+		if ep.URL != wantURL {
+			t.Errorf("eps[%d].URL = %q, want %q (player URL, /episode/ rewritten to /anime/)", i, ep.URL, wantURL)
 		}
 	}
 }
 
-func TestGetEpisodes_ShortAnime(t *testing.T) {
+func TestGetVideoURL(t *testing.T) {
 	t.Parallel()
-	c := NewClient()
-	episodes, err := c.GetEpisodes(context.Background(), "Road-of-Naruto-aaaaaaaaa")
-	if err != nil {
-		t.Fatalf("GetEpisodes failed: %v", err)
+	cases := []struct {
+		kind     string
+		wantType VideoSourceType
+		checkURL func(string) bool
+	}{
+		{"m3u8", VideoSourceM3U8, func(u string) bool { return strings.HasSuffix(u, "/playlist.m3u8") }},
+		{"mp4", VideoSourceMP4, func(u string) bool { return strings.HasSuffix(u, "/video.mp4") }},
+		{"youtube", VideoSourceYouTube, func(u string) bool { return u == "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }},
 	}
+	for _, tc := range cases {
+		t.Run(tc.kind, func(t *testing.T) {
+			t.Parallel()
+			srv := newSaturnServer(t, tc.kind, nil)
+			c := NewClient(WithBaseURL(srv.URL))
 
-	if len(episodes) != 1 {
-		t.Fatalf("expected 1 episode, got %d", len(episodes))
-	}
-	if episodes[0].Number != 1 {
-		t.Errorf("expected episode number 1, got %d", episodes[0].Number)
+			src, err := c.GetVideoURL(context.Background(), srv.URL+"/anime/naruto-iN621/ep-1")
+			if err != nil {
+				t.Fatalf("GetVideoURL: %v", err)
+			}
+			if src.Type != tc.wantType {
+				t.Errorf("Type = %q, want %q", src.Type, tc.wantType)
+			}
+			if !tc.checkURL(src.URL) {
+				t.Errorf("unexpected decoded URL: %q", src.URL)
+			}
+		})
 	}
 }
 
-func TestGetVideoURL_MP4(t *testing.T) {
+// GetVideoURL must accept the /episode/<slug>/ep-N interstitial form and normalize it to
+// the /anime/<slug>/ep-N player page.
+func TestGetVideoURL_NormalizesInterstitialURL(t *testing.T) {
 	t.Parallel()
-	c := NewClient()
-	// Frieren ep 1 is known to serve mp4
-	src, err := c.GetVideoURL(context.Background(), "https://www.animesaturn.cx/ep/Frieren-Beyond-Journeys-End-ep-1")
-	if err != nil {
-		t.Fatalf("GetVideoURL failed: %v", err)
-	}
-	if src.Type != VideoSourceMP4 {
-		t.Errorf("expected mp4, got %s", src.Type)
-	}
-	if !strings.HasSuffix(src.URL, ".mp4") {
-		t.Errorf("expected URL ending with .mp4, got %s", src.URL)
-	}
-	if !strings.HasPrefix(src.URL, "https://") {
-		t.Errorf("expected https URL, got %s", src.URL)
-	}
-}
+	srv := newSaturnServer(t, "m3u8", nil)
+	c := NewClient(WithBaseURL(srv.URL))
 
-func TestGetVideoURL_M3U8(t *testing.T) {
-	t.Parallel()
-	c := NewClient()
-	// Naruto ep 1 is known to serve m3u8
-	src, err := c.GetVideoURL(context.Background(), "https://www.animesaturn.cx/ep/Naruto-ep-1")
+	src, err := c.GetVideoURL(context.Background(), srv.URL+"/episode/naruto-iN621/ep-1")
 	if err != nil {
-		t.Fatalf("GetVideoURL failed: %v", err)
+		t.Fatalf("GetVideoURL(interstitial form): %v", err)
 	}
 	if src.Type != VideoSourceM3U8 {
-		t.Errorf("expected m3u8, got %s", src.Type)
+		t.Errorf("Type = %q, want m3u8", src.Type)
 	}
-	if !strings.Contains(src.URL, ".m3u8") {
-		t.Errorf("expected URL containing .m3u8, got %s", src.URL)
-	}
-	if !strings.HasPrefix(src.URL, "https://") {
-		t.Errorf("expected https URL, got %s", src.URL)
+}
+
+func TestGetVideoURL_NoIframe(t *testing.T) {
+	t.Parallel()
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write([]byte("<html><body>no player embedded here</body></html>"))
+	}))
+	defer srv.Close()
+
+	c := NewClient(WithBaseURL(srv.URL))
+	if _, err := c.GetVideoURL(context.Background(), srv.URL+"/anime/x/ep-1"); err == nil {
+		t.Fatal("expected an error when the player page has no watch-iframe")
 	}
 }

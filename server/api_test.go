@@ -141,8 +141,8 @@ func TestApiVideo_MP4(t *testing.T) {
 	if vr.Type != "mp4" {
 		t.Errorf("want type=mp4, got %q", vr.Type)
 	}
-	if !strings.HasPrefix(vr.URL, "/proxy/stream?url=") {
-		t.Errorf("expected /proxy/stream?url=..., got %q", vr.URL)
+	if !strings.HasPrefix(vr.URL, "proxy/stream?url=") {
+		t.Errorf("expected proxy/stream?url=..., got %q", vr.URL)
 	}
 	if vr.OriginalURL != cdnURL {
 		t.Errorf("want original_url=%q, got %q", cdnURL, vr.OriginalURL)
@@ -167,8 +167,8 @@ func TestApiVideo_M3U8(t *testing.T) {
 	if vr.Type != "m3u8" {
 		t.Errorf("want type=m3u8, got %q", vr.Type)
 	}
-	if !strings.HasPrefix(vr.URL, "/proxy/m3u8?url=") {
-		t.Errorf("expected /proxy/m3u8?url=..., got %q", vr.URL)
+	if !strings.HasPrefix(vr.URL, "proxy/m3u8?url=") {
+		t.Errorf("expected proxy/m3u8?url=..., got %q", vr.URL)
 	}
 	if vr.OriginalURL != cdnURL {
 		t.Errorf("want original_url=%q, got %q", cdnURL, vr.OriginalURL)

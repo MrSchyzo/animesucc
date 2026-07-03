@@ -1,3 +1,5 @@
+//go:build integration
+
 package animesucc
 
 import (
@@ -22,14 +24,8 @@ func TestDownloadHLS(t *testing.T) {
 	}
 	t.Parallel()
 
+	src := liveM3U8Source(context.Background(), t)
 	c := NewClient()
-	src, err := c.GetVideoURL(context.Background(), "https://www.animesaturn.cx/ep/Naruto-ep-1")
-	if err != nil {
-		t.Fatalf("GetVideoURL: %v", err)
-	}
-	if src.Type != VideoSourceM3U8 {
-		t.Fatalf("expected m3u8 source, got %s", src.Type)
-	}
 
 	tmpFile, err := os.CreateTemp("", "hls-test-*.mp4")
 	if err != nil {
@@ -68,14 +64,8 @@ func TestDownloadHLS(t *testing.T) {
 func TestResolveHLSSegments(t *testing.T) {
 	t.Parallel()
 
+	src := liveM3U8Source(context.Background(), t)
 	c := NewClient()
-	src, err := c.GetVideoURL(context.Background(), "https://www.animesaturn.cx/ep/Naruto-ep-1")
-	if err != nil {
-		t.Fatalf("GetVideoURL: %v", err)
-	}
-	if src.Type != VideoSourceM3U8 {
-		t.Fatalf("expected m3u8 source, got %s", src.Type)
-	}
 
 	segments, err := c.resolveHLSSegments(context.Background(), src.URL)
 	if err != nil {
@@ -97,11 +87,8 @@ func TestResolveHLSSegments(t *testing.T) {
 func TestRemuxTSToMP4(t *testing.T) {
 	t.Parallel()
 
+	src := liveM3U8Source(context.Background(), t)
 	c := NewClient()
-	src, err := c.GetVideoURL(context.Background(), "https://www.animesaturn.cx/ep/Naruto-ep-1")
-	if err != nil {
-		t.Fatalf("GetVideoURL: %v", err)
-	}
 
 	segments, err := c.resolveHLSSegments(context.Background(), src.URL)
 	if err != nil {
@@ -134,11 +121,8 @@ func TestRemuxTSToMP4(t *testing.T) {
 func TestRemuxWithFFmpeg(t *testing.T) {
 	t.Parallel()
 
+	src := liveM3U8Source(context.Background(), t)
 	c := NewClient()
-	src, err := c.GetVideoURL(context.Background(), "https://www.animesaturn.cx/ep/Naruto-ep-1")
-	if err != nil {
-		t.Fatalf("GetVideoURL: %v", err)
-	}
 
 	segments, err := c.resolveHLSSegments(context.Background(), src.URL)
 	if err != nil {

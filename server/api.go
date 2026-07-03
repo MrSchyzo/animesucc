@@ -66,6 +66,13 @@ func (s *server) apiVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// YouTube-hosted episodes are embedded directly by the browser; there is nothing to
+	// proxy, so return the watch URL as-is.
+	if src.Type == animesucc.VideoSourceYouTube {
+		writeJSON(w, videoResponse{URL: src.URL, OriginalURL: src.URL, Type: string(src.Type)})
+		return
+	}
+
 	proxyPath := "proxy/stream"
 	if src.Type == animesucc.VideoSourceM3U8 {
 		proxyPath = "proxy/m3u8"

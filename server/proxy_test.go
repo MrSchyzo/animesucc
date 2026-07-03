@@ -38,10 +38,10 @@ func TestRewriteM3U8_MediaPlaylist(t *testing.T) {
 	if strings.Contains(out, "cdn.example.com/seg-001.ts") {
 		t.Error("segment URLs should be rewritten")
 	}
-	if !strings.Contains(out, "/proxy/ts?url=") {
-		t.Errorf("expected /proxy/ts?url=... in output, got:\n%s", out)
+	if !strings.Contains(out, "ts?url=") {
+		t.Errorf("expected ts?url=... in output, got:\n%s", out)
 	}
-	if strings.Count(out, "/proxy/ts?url=") != 2 {
+	if strings.Count(out, "ts?url=") != 2 {
 		t.Errorf("expected 2 rewritten segments, got:\n%s", out)
 	}
 }
@@ -49,8 +49,8 @@ func TestRewriteM3U8_MediaPlaylist(t *testing.T) {
 func TestRewriteM3U8_MasterPlaylist(t *testing.T) {
 	input := "#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=800000\nhttps://cdn.example.com/360p/playlist.m3u8\n#EXT-X-STREAM-INF:BANDWIDTH=2000000\nhttps://cdn.example.com/720p/playlist.m3u8\n"
 	out := rewriteM3U8(input, baseURL(t, "https://cdn.example.com/master.m3u8"))
-	if !strings.Contains(out, "/proxy/m3u8?url=") {
-		t.Errorf("expected /proxy/m3u8?url=... for variant playlists, got:\n%s", out)
+	if !strings.Contains(out, "m3u8?url=") {
+		t.Errorf("expected m3u8?url=... for variant playlists, got:\n%s", out)
 	}
 	if strings.Contains(out, "cdn.example.com/360p") {
 		t.Error("variant playlist URLs should be rewritten")
@@ -72,8 +72,8 @@ func TestRewriteM3U8_ExtXKey(t *testing.T) {
 	if strings.Contains(out, "cdn.example.com/key.bin") {
 		t.Error("key URI should be rewritten through proxy")
 	}
-	if !strings.Contains(out, `URI="/proxy/ts?url=`) {
-		t.Errorf("key URI should be proxied via /proxy/ts, got:\n%s", out)
+	if !strings.Contains(out, `URI="ts?url=`) {
+		t.Errorf("key URI should be proxied via ts?url=, got:\n%s", out)
 	}
 	if !strings.Contains(out, "METHOD=AES-128") {
 		t.Error("METHOD attribute must be preserved")
@@ -86,15 +86,15 @@ func TestRewriteM3U8_ExtXMedia(t *testing.T) {
 	if strings.Contains(out, `URI="https://`) {
 		t.Error("EXT-X-MEDIA URI should not be a direct CDN URL")
 	}
-	if !strings.Contains(out, `URI="/proxy/m3u8?url=`) {
-		t.Errorf("EXT-X-MEDIA URI should be proxied via /proxy/m3u8, got:\n%s", out)
+	if !strings.Contains(out, `URI="m3u8?url=`) {
+		t.Errorf("EXT-X-MEDIA URI should be proxied via m3u8?url=, got:\n%s", out)
 	}
 }
 
 func TestRewriteM3U8_ExtXMap(t *testing.T) {
 	input := "#EXTM3U\n#EXT-X-MAP:URI=\"init.mp4\"\n#EXTINF:4.0,\nseg-001.ts\n"
 	out := rewriteM3U8(input, baseURL(t, "https://cdn.example.com/path/playlist.m3u8"))
-	if !strings.Contains(out, `URI="/proxy/ts?url=`) {
+	if !strings.Contains(out, `URI="ts?url=`) {
 		t.Errorf("EXT-X-MAP URI should be rewritten, got:\n%s", out)
 	}
 }
@@ -225,16 +225,19 @@ func TestProxyM3U8_Rewrite(t *testing.T) {
 	}
 	body, _ := io.ReadAll(resp.Body)
 	out := string(body)
-	if !strings.Contains(out, "/proxy/ts?url=") {
+	if !strings.Contains(out, "ts?url=") {
 		t.Errorf("expected segment URLs to be rewritten, got:\n%s", out)
 	}
-	// Every non-comment, non-empty line must start with /proxy/
+	// Emitted URLs are relative (ts?url= / m3u8?url=) so the proxy can be mounted under
+	// any subpath without configuration; every non-comment, non-empty line must be one of
+	// those forms.
 	for _, line := range strings.Split(strings.TrimRight(out, "\n"), "\n") {
-		if line != "" && !strings.HasPrefix(line, "#") && !strings.HasPrefix(line, "/proxy/") {
+		if line != "" && !strings.HasPrefix(line, "#") &&
+			!strings.HasPrefix(line, "ts?url=") && !strings.HasPrefix(line, "m3u8?url=") {
 			t.Errorf("unrewritten line found: %q", line)
 		}
 	}
-	if strings.Count(out, "/proxy/ts?url=") != 2 {
+	if strings.Count(out, "ts?url=") != 2 {
 		t.Errorf("expected 2 rewritten segments, got:\n%s", out)
 	}
 }

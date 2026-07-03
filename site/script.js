@@ -53,8 +53,10 @@ async function resolveVideoURL(originalURL, proxiedURL) {
 async function changeVideoSource(episodeURL, title) {
     let videoMp4 = document.getElementById("video-player-mp4")
     let videoHls = document.getElementById("video-player-hls")
+    let videoYt = document.getElementById("video-player-youtube")
     setVideoLoading("video-player-mp4")
     setVideoLoading("video-player-hls")
+    if (videoYt) { videoYt.removeAttribute("src"); videoYt.style.display = "none" }
 
     document.getElementById("video-container-title").innerText = title
 
@@ -62,6 +64,18 @@ async function changeVideoSource(episodeURL, title) {
         if (!r.ok) throw new Error(`video API error: ${r.status}`)
         return r.json()
     })
+
+    if (type === 'youtube') {
+        videoMp4.style.display = "none"
+        videoHls.style.display = "none"
+        if (videoYt) {
+            const m = originalURL.match(/[?&]v=([^&]+)/)
+            videoYt.src = `https://www.youtube.com/embed/${m ? m[1] : ""}`
+            videoYt.style.display = "block"
+        }
+        return
+    }
+
     const url = await resolveVideoURL(originalURL, proxiedURL)
 
     if (type === 'mp4') {
