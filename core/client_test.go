@@ -11,7 +11,7 @@ import (
 func TestClient_AnimeSaturnReachable(t *testing.T) {
 	t.Parallel()
 	c := NewClient()
-	body, err := c.fetchURL(context.Background(), "https://www.animesaturn.net/")
+	body, err := c.fetchURL(context.Background(), "https://www.animesaturn.ro/")
 	if err != nil {
 		t.Fatalf("fetchURL(animesaturn): %v", err)
 	}

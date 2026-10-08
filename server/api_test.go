@@ -89,7 +89,7 @@ func TestApiSearch_UpstreamError(t *testing.T) {
 func TestApiEpisodes_OK(t *testing.T) {
 	s := newTestServer(&mockClient{
 		episodesFn: func(_ context.Context, link string) ([]animesucc.Episode, error) {
-			return []animesucc.Episode{{Number: 1, URL: "https://animesaturn.cx/ep/op-ep-1"}}, nil
+			return []animesucc.Episode{{Number: 1, URL: "https://animesaturn.ro/ep/op-ep-1"}}, nil
 		},
 	})
 	rec := httptest.NewRecorder()
@@ -128,7 +128,7 @@ func TestApiVideo_MP4(t *testing.T) {
 		},
 	})
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", "/api/video?url=https://animesaturn.cx/ep/op-ep-1", nil)
+	req := httptest.NewRequest("GET", "/api/video?url=https://animesaturn.ro/ep/op-ep-1", nil)
 	s.apiVideo(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -157,7 +157,7 @@ func TestApiVideo_M3U8(t *testing.T) {
 		},
 	})
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", "/api/video?url=https://animesaturn.cx/ep/op-ep-1", nil)
+	req := httptest.NewRequest("GET", "/api/video?url=https://animesaturn.ro/ep/op-ep-1", nil)
 	s.apiVideo(rec, req)
 
 	var vr videoResponse
@@ -192,7 +192,7 @@ func TestApiVideo_UpstreamError(t *testing.T) {
 		},
 	})
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", "/api/video?url=https://animesaturn.cx/ep/bad", nil)
+	req := httptest.NewRequest("GET", "/api/video?url=https://animesaturn.ro/ep/bad", nil)
 	s.apiVideo(rec, req)
 	if rec.Code != http.StatusBadGateway {
 		t.Fatalf("want 502, got %d", rec.Code)

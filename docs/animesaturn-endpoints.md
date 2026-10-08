@@ -4,7 +4,7 @@ How AnimeSucc talks to AnimeSaturn: the endpoints, the request/response shapes, 
 the video-source obfuscation. This is the source of truth for the scraping layer in
 `core/` — keep it updated when the site changes.
 
-> **Last verified: 2026-07-02** against `https://www.animesaturn.net`.
+> **Last verified: 2026-07-02** against `https://www.animesaturn.ro`.
 > AnimeSaturn rotates domains and periodically revamps its HTML; if scraping breaks,
 > re-run the recon in [§4](#4-how-to-re-verify-replicate) and update this file.
 
@@ -12,12 +12,12 @@ the video-source obfuscation. This is the source of truth for the scraping layer
 
 | Host | Role |
 |------|------|
-| `https://www.animesaturn.net` | Main site (search, anime pages, player pages). `animesaturn.cx` 301-redirects here. Overridable via `ANIMESUCC_BASE_URL`. |
+| `https://www.animesaturn.ro` | Main site (search, anime pages, player pages). `animesaturn.ro` 301-redirects here. Overridable via `ANIMESUCC_BASE_URL`. |
 | `https://img.saturncdn.net` | Cover/poster/slider images. |
 | `https://play.saturncdn.net` | Video player embed + the source-resolving JSON endpoint. |
 | `https://*.streampeaker.org` | Actual video CDN (HLS `.m3u8` / `.mp4`). Host varies per episode (e.g. `srv37.nezumi.streampeaker.org`) and URLs are signed + short-lived. |
 
-The homepage sets an `as_session` cookie (HttpOnly, scoped to `animesaturn.net`). It is
+The homepage sets an `as_session` cookie (HttpOnly, scoped to `animesaturn.ro`). It is
 not required for the `play.saturncdn.net` endpoints (different host), but the client
 keeps a cookie jar so any future gating is handled transparently.
 
@@ -148,13 +148,13 @@ func deobfuscate(b64, key string) (string, error) {
 UA="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 
 # search
-curl -sL -A "$UA" "https://www.animesaturn.net/filter?key=one%20piece" | grep -oE '<a href="/anime/[^"]+" class="ac'
+curl -sL -A "$UA" "https://www.animesaturn.ro/filter?key=one%20piece" | grep -oE '<a href="/anime/[^"]+" class="ac'
 
 # episodes
-curl -sL -A "$UA" "https://www.animesaturn.net/anime/one-piece-PmTvj" | grep -oE '/episode/[A-Za-z0-9-]+/ep-[0-9]+' | sort -u
+curl -sL -A "$UA" "https://www.animesaturn.ro/anime/one-piece-PmTvj" | grep -oE '/episode/[A-Za-z0-9-]+/ep-[0-9]+' | sort -u
 
 # player page -> embed iframe (note: /episode/ -> /anime/)
-curl -sL -A "$UA" "https://www.animesaturn.net/anime/one-piece-PmTvj/ep-1" | grep -oE '<iframe id="watch-iframe" src="[^"]+"'
+curl -sL -A "$UA" "https://www.animesaturn.ro/anime/one-piece-PmTvj/ep-1" | grep -oE '<iframe id="watch-iframe" src="[^"]+"'
 
 # source JSON (insert /playlist before the query)
 curl -sL -A "$UA" -H "X-Requested-With: XMLHttpRequest" \

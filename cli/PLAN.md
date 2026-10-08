@@ -2,7 +2,7 @@
 
 ## Context
 
-Build a Go CLI app that searches animesaturn.cx, lets the user pick an anime from results, then downloads all (or selected) episodes as mp4 files. The site serves video via both direct `.mp4` URLs and `.m3u8` HLS playlists. m3u8 downloads prefer shelling out to `ffmpeg` but fall back to native Go HLS segment download if ffmpeg is not installed. Downloads run in parallel with per-episode progress bars.
+Build a Go CLI app that searches animesaturn.ro, lets the user pick an anime from results, then downloads all (or selected) episodes as mp4 files. The site serves video via both direct `.mp4` URLs and `.m3u8` HLS playlists. m3u8 downloads prefer shelling out to `ffmpeg` but fall back to native Go HLS segment download if ffmpeg is not installed. Downloads run in parallel with per-episode progress bars.
 
 Architecture is designed so the core logic can be driven by any frontend (CLI, HTTP server, etc.) — the CLI is just one adapter.
 
